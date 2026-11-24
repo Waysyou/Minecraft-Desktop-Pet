@@ -1,0 +1,14 @@
+const fs=require('fs');const vm=require('vm');
+const acorn=require('G:/Academic-AI-Toolkit/protocol-research/js-parser/node_modules/acorn');
+const source=fs.readFileSync('G:/Desktop-Apps/codex-integration/research/src-CsH31EEu.js','utf8');
+const ast=acorn.parse(source,{ecmaVersion:'latest',sourceType:'script'});
+const wanted=new Set(['lJ','hJ','gJ','_J','vJ']);
+const functions=ast.body.filter(n=>n.type==='FunctionDeclaration'&&wanted.has(n.id.name)).map(n=>source.slice(n.start,n.end)).join('\n');
+if(functions.length===0)throw new Error('Native image decoder not found');
+const context=vm.createContext({Buffer,nJ:1536,rJ:1872,iJ:2288},{codeGeneration:{strings:false,wasm:false}});
+vm.runInContext(functions,context,{timeout:1000});
+context.bytes=fs.readFileSync('G:/Desktop-Apps/codex-integration/pet-package/spritesheet.webp');
+const check=vm.runInContext('({v2:lJ(bytes,2)!==null,v1:lJ(bytes,1)!==null,header:hJ(bytes)})',context,{timeout:1000});
+if(!check.v2||check.v1)throw new Error('Unexpected native decoder result');
+fs.writeFileSync('G:/Desktop-Apps/reports/codex-pet-native-image-check.json',JSON.stringify({check,scope:'Exact pure image-header functions from installed Codex 26.1016.6573.0; does not prove UI activation'},null,2));
+console.log(JSON.stringify(check));

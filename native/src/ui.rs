@@ -1,5 +1,6 @@
 use super::*;
 use windows_sys::Win32::UI::Controls::Dialogs::*;
+pub(super) const PANEL_HEIGHT: f32 = 842.;
 const SLIDER_IDS: [i32; 10] = [200, 201, 202, 203, 204, 205, 206, 207, 211, 212];
 const SS_PATHELLIPSIS: u32 = 0x8000;
 const SS_RIGHT: u32 = 2;
@@ -65,7 +66,7 @@ impl App {
             left: 0,
             top: 0,
             right: (760. * d) as i32,
-            bottom: (786. * d) as i32,
+            bottom: (PANEL_HEIGHT * d) as i32,
         };
         AdjustWindowRectExForDpi(
             &mut rect,
@@ -92,7 +93,7 @@ impl App {
             DeleteObject(self.font);
         }
         self.font = CreateFontW(
-            (-16. * d) as i32,
+            (-15. * d) as i32,
             0,
             0,
             0,
@@ -110,92 +111,91 @@ impl App {
         self.controls.clear();
         self.layout.clear();
         self.page_controls.clear();
-        self.building_page = 3;
-        for (i, text) in ["常规", "视线与角度", "自定义姿态"].iter().enumerate() {
+        self.building_page = 4;
+        for (i, text) in ["常规设置", "视线与角度", "自定义姿态", "按键统计"].iter().enumerate() {
             self.control(
                 "BUTTON",
                 text,
                 BS_RADIOBUTTON as u32 | BS_PUSHLIKE as u32 | WS_TABSTOP,
-                24 + i as i32 * 242,
-                16,
-                226,
+                24 + i as i32 * 180,
+                75,
+                170,
                 34,
                 150 + i as i32,
             );
         }
         self.building_page = 0;
         // General page: uniform 36px row pitch and aligned labels/inputs.
-        self.control("STATIC", "皮肤", 0, 24, 82, 110, 24, 0);
-        self.control("STATIC", "", SS_PATHELLIPSIS, 150, 82, 325, 24, 300);
-        self.control("BUTTON", "导入皮肤…", BS_PUSHBUTTON as u32 | WS_TABSTOP, 490, 76, 120, 30, 101);
-        self.control("BUTTON", "恢复内置", BS_PUSHBUTTON as u32 | WS_TABSTOP, 624, 76, 110, 30, 102);
-        self.control("STATIC", "正版 ID", 0, 24, 118, 110, 24, 331);
-        let input = self.control("EDIT", &self.online_id.clone(), WS_BORDER | WS_TABSTOP | ES_AUTOHSCROLL as u32, 150, 112, 325, 30, 330);
+        self.control("STATIC", "皮肤", 0, 34, 155, 110, 24, 0);
+        self.control("STATIC", "", SS_PATHELLIPSIS, 150, 155, 325, 24, 300);
+        self.control("BUTTON", "导入皮肤…", BS_PUSHBUTTON as u32 | WS_TABSTOP, 490, 151, 120, 30, 101);
+        self.control("BUTTON", "恢复内置", BS_PUSHBUTTON as u32 | WS_TABSTOP, 624, 151, 110, 30, 102);
+        self.control("STATIC", "正版 ID", 0, 34, 184, 110, 24, 331);
+        let input = self.control("EDIT", &self.online_id.clone(), WS_BORDER | WS_TABSTOP | ES_AUTOHSCROLL as u32, 150, 180, 325, 30, 330);
         SendMessageW(input, EM_SETLIMITTEXT, 36, 0);
-        SendMessageW(input, 0x1501, 0, wide("Java 版用户名或 UUID").as_ptr() as isize);
-        self.control("BUTTON", "获取皮肤", BS_PUSHBUTTON as u32 | WS_TABSTOP, 490, 112, 120, 30, 104);
-        self.control("STATIC", "无需登录", 0, 624, 118, 110, 24, 332);
-        self.control("STATIC", &self.online_notice.clone(), 0, 150, 154, 584, 24, 333);
-        self.control("STATIC", "手臂", 0, 24, 178, 110, 24, 0);
-        self.radio("经典（4 px）", 150, 174, 155, 114);
-        self.radio("纤细（3 px）", 330, 174, 155, 115);
-        self.control("STATIC", "外观", 0, 24, 210, 110, 24, 0);
-        self.check("显示皮肤外层", 150, 206, 220, 124);
-        self.check("Q 版小人", 490, 206, 220, 139);
-        self.control("STATIC", "姿势", 0, 24, 242, 110, 24, 0);
-        self.radio("站立", 150, 238, 100, 110);
-        self.radio("坐下", 260, 238, 100, 111);
-        self.radio("自定义", 370, 238, 115, 116);
-        self.control("STATIC", "站立时按住 Shift 潜行", 0, 490, 242, 244, 24, 0);
-        self.control("STATIC", "敲字", 0, 24, 274, 110, 24, 0);
-        self.radio("精准按键", 150, 270, 155, 112);
-        self.radio("双手交替", 330, 270, 155, 113);
-        self.control("STATIC", "坐姿下响应键盘", 0, 490, 274, 244, 24, 0);
-        self.control("STATIC", "主手", 0, 24, 306, 110, 24, 0);
-        self.radio("右手挥动", 150, 302, 140, 118);
-        self.radio("左手挥动", 295, 302, 140, 119);
-        self.radio("实际映射", 440, 302, 140, 165);
-        self.radio("反向映射", 585, 302, 149, 166);
-        self.control("STATIC", "桌面", 0, 24, 338, 110, 24, 0);
-        self.check("保持置顶", 150, 334, 150, 120);
-        self.check("完全鼠标穿透", 330, 334, 220, 121);
-        self.control("BUTTON", "找回桌宠", BS_PUSHBUTTON as u32 | WS_TABSTOP, 594, 332, 140, 30, 130);
-        self.control("STATIC", "键盘", 0, 24, 370, 110, 24, 0);
-        self.check("全局键盘互动", 150, 366, 170, 122);
-        self.check("hyp快速队伍聊天", 330, 366, 220, 137);
-        self.control("STATIC", "# → /p chat", 0, 555, 370, 179, 24, 0);
-        self.control("STATIC", "动画", 0, 24, 402, 110, 24, 0);
-        self.check("DA眨眼（需修改过皮肤）", 150, 398, 298, 163);
-        self.check("DA扭腰", 450, 398, 120, 164);
-        self.check("敲字浮现字", 580, 398, 154, 167);
-        self.control("STATIC", "大小", 0, 24, 466, 110, 24, 0);
-        self.slider(200, 150, 462, 490, 65, 180);
-        self.control("STATIC", "", SS_RIGHT, 650, 466, 84, 24, 310);
-        self.control("STATIC", "帧率", 0, 24, 498, 110, 24, 0);
-        self.slider(207, 150, 494, 490, 0, 6);
-        self.control("STATIC", "", SS_RIGHT, 650, 498, 84, 24, 607);
-        self.control("STATIC", "打字压低", 0, 24, 530, 120, 24, 0);
-        self.slider(211, 150, 526, 490, 0, 30);
-        self.control("STATIC", "", SS_RIGHT, 650, 530, 84, 24, 611);
-        self.control("STATIC", "Q版身体大小", 0, 24, 562, 125, 24, 0);
-        self.slider(212, 150, 558, 490, 50, 180);
-        self.control("STATIC", "", SS_RIGHT, 650, 562, 84, 24, 612);
-        self.control("STATIC", "其他", 0, 24, 594, 110, 24, 0);
-        self.check("显示正版披风", 150, 590, 220, 138);
-        self.check("随 Windows 登录自动启动", 430, 590, 304, 160);
-        self.control("STATIC", "音乐", 0, 24, 626, 110, 24, 0);
-        self.check("播放音乐时冒音符", 150, 622, 260, 171);
-        self.check("可调戏", 150, 430, 150, 172);
-        self.check("呼吸动画", 330, 430, 155, 173);
-        self.control("STATIC", "开启后持续轻微呼吸", 0, 490, 434, 244, 24, 0);
+        self.control("BUTTON", "获取皮肤", BS_PUSHBUTTON as u32 | WS_TABSTOP, 490, 180, 120, 30, 104);
+        self.control("STATIC", "无需登录", 0, 624, 184, 110, 24, 332);
+        self.control("STATIC", "", 0, 150, 211, 584, 24, 333);
+        self.control("STATIC", "手臂", 0, 34, 236, 110, 24, 0);
+        self.radio("经典（4 px）", 150, 232, 155, 114);
+        self.radio("纤细（3 px）", 330, 232, 155, 115);
+        self.control("STATIC", "外观", 0, 34, 264, 110, 24, 0);
+        self.check("显示皮肤外层", 150, 260, 220, 124);
+        self.check("Q 版小人", 490, 260, 220, 139);
+        self.control("STATIC", "姿势", 0, 34, 292, 110, 24, 0);
+        self.radio("站立", 150, 288, 100, 110);
+        self.radio("坐下", 260, 288, 100, 111);
+        self.radio("自定义", 370, 288, 115, 116);
+        self.control("STATIC", "站立时按住 Shift 潜行", 0, 490, 292, 244, 24, 0);
+        self.control("STATIC", "敲字", 0, 34, 375, 110, 24, 0);
+        self.radio("精准按键", 150, 371, 155, 112);
+        self.radio("双手交替", 330, 371, 155, 113);
+        self.control("STATIC", "坐姿下响应键盘", 0, 490, 375, 244, 24, 0);
+        self.control("STATIC", "主手", 0, 34, 403, 110, 24, 0);
+        self.radio("右手挥动", 150, 399, 140, 118);
+        self.radio("左手挥动", 295, 399, 140, 119);
+        self.radio("实际映射", 440, 399, 140, 165);
+        self.radio("反向映射", 585, 399, 149, 166);
+        self.control("STATIC", "桌面", 0, 34, 431, 110, 24, 0);
+        self.check("保持置顶", 150, 427, 150, 120);
+        self.check("完全鼠标穿透", 330, 427, 220, 121);
+        self.control("BUTTON", "找回桌宠", BS_PUSHBUTTON as u32 | WS_TABSTOP, 594, 425, 140, 30, 130);
+        self.control("STATIC", "键盘", 0, 34, 459, 110, 24, 0);
+        self.check("全局键盘互动", 150, 455, 170, 122);
+        self.check("Hypixel 队伍聊天", 330, 455, 220, 137);
+        self.control("STATIC", "# → /p chat", 0, 555, 459, 179, 24, 0);
+        self.control("STATIC", "动画", 0, 34, 487, 110, 24, 0);
+        self.check("DA眨眼（需修改过皮肤）", 150, 483, 298, 163);
+        self.check("DA 扭腰", 450, 483, 120, 164);
+        self.check("敲字浮字", 580, 483, 154, 167);
+        self.control("STATIC", "大小", 0, 34, 594, 110, 24, 0);
+        self.slider(200, 150, 590, 490, 65, 180);
+        self.control("STATIC", "", SS_RIGHT, 650, 594, 84, 24, 310);
+        self.control("STATIC", "帧率", 0, 34, 622, 110, 24, 0);
+        self.slider(207, 150, 618, 490, 0, 6);
+        self.control("STATIC", "", SS_RIGHT, 650, 622, 84, 24, 607);
+        self.control("STATIC", "打字压低", 0, 34, 650, 120, 24, 0);
+        self.slider(211, 150, 646, 490, 0, 30);
+        self.control("STATIC", "", SS_RIGHT, 650, 650, 84, 24, 611);
+        self.control("STATIC", "Q版身体大小", 0, 34, 678, 125, 24, 0);
+        self.slider(212, 150, 674, 490, 50, 180);
+        self.control("STATIC", "", SS_RIGHT, 650, 678, 84, 24, 612);
+        self.control("STATIC", "其他", 0, 34, 708, 110, 24, 0);
+        self.check("显示正版披风", 150, 704, 220, 138);
+        self.check("随 Windows 登录自动启动", 430, 704, 304, 160);
+        self.control("STATIC", "音乐", 0, 34, 736, 110, 24, 0);
+        self.check("播放音乐时冒音符", 150, 732, 260, 171);
+        self.check("长按互动", 150, 511, 150, 172);
+        self.check("呼吸动画", 330, 511, 155, 173);
+        self.control("STATIC", "开启后持续轻微呼吸", 0, 490, 515, 244, 24, 0);
         self.building_page = 1;
-        self.control("STATIC", "整体角度偏移", 0, 24, 78, 280, 24, 0);
+        self.control("STATIC", "整体角度偏移", 0, 34, 133, 280, 24, 0);
         self.control(
             "BUTTON",
             "角度归零",
             BS_PUSHBUTTON as u32 | WS_TABSTOP,
             624,
-            72,
+            127,
             110,
             30,
             133,
@@ -204,27 +204,27 @@ impl App {
             .iter()
             .enumerate()
         {
-            let y = 122 + i as i32 * 43;
-            self.control("STATIC", label, 0, 24, y, 160, 24, 0);
+            let y = 177 + i as i32 * 43;
+            self.control("STATIC", label, 0, 34, y, 160, 24, 0);
             self.slider(208 + i as i32, 180, y - 3, 445, -180, 180);
             self.control("STATIC", "", SS_RIGHT, 636, y, 98, 24, 608 + i as i32);
         }
-        self.check("视线跟随鼠标", 24, 268, 240, 123);
+        self.check("视线跟随鼠标", 34, 323, 240, 123);
         self.control(
             "BUTTON",
             "跟随复位",
             BS_PUSHBUTTON as u32 | WS_TABSTOP,
             624,
-            264,
+            319,
             110,
             30,
             132,
         );
-        self.control("STATIC", "水平 · 左右", 0, 24, 314, 240, 24, 0);
-        self.control("STATIC", "垂直 · 上下", 0, 400, 314, 240, 24, 0);
-        for (col, base) in [(24, 201), (400, 204)] {
+        self.control("STATIC", "水平 · 左右", 0, 34, 369, 240, 24, 0);
+        self.control("STATIC", "垂直 · 上下", 0, 400, 369, 240, 24, 0);
+        for (col, base) in [(34, 201), (400, 204)] {
             for (row, label) in ["灵敏度", "转动范围", "中心偏移"].iter().enumerate() {
-                let y = 356 + row as i32 * 62;
+                let y = 411 + row as i32 * 62;
                 let id = base + row as i32;
                 self.control("STATIC", label, 0, col, y, 160, 22, 0);
                 self.control("STATIC", "", SS_RIGHT, col + 235, y, 95, 22, 400 + id);
@@ -236,29 +236,29 @@ impl App {
                 self.slider(id, col, y + 23, 330, min, max);
             }
         }
-        self.control("STATIC", "负值偏左，正值偏右", 0, 24, 550, 335, 24, 0);
-        self.control("STATIC", "负值抬头，正值低头", 0, 400, 550, 335, 24, 0);
+        self.control("STATIC", "负值偏左，正值偏右", 0, 34, 605, 335, 24, 0);
+        self.control("STATIC", "负值抬头，正值低头", 0, 400, 605, 335, 24, 0);
 
         self.building_page = 2;
-        self.radio("使用自定义姿态", 24, 74, 230, 117);
-        self.radio("站姿", 300, 74, 110, 135);
-        self.radio("坐姿", 425, 74, 110, 136);
+        self.radio("使用自定义姿态", 34, 129, 230, 117);
+        self.radio("站姿", 300, 129, 110, 135);
+        self.radio("坐姿", 425, 129, 110, 136);
         self.control(
             "BUTTON",
             "姿态归零",
             BS_PUSHBUTTON as u32 | WS_TABSTOP,
             624,
-            72,
+            127,
             110,
             30,
             134,
         );
         self.control(
             "STATIC",
-            "站姿和坐姿分别保存；坐姿角度在默认坐姿上调整。",
+            "站姿和坐姿分别保存。坐姿角度在默认坐姿上调整。",
             0,
-            24,
-            116,
+            34,
+            171,
             710,
             24,
             0,
@@ -267,14 +267,14 @@ impl App {
             .iter()
             .enumerate()
         {
-            self.control("STATIC", label, 0, 120 + axis as i32 * 205, 164, 200, 24, 0);
+            self.control("STATIC", label, 0, 120 + axis as i32 * 205, 219, 200, 24, 0);
         }
         for (row, name) in ["头部", "身体", "左臂", "右臂", "左腿", "右腿"]
             .iter()
             .enumerate()
         {
-            let y = 214 + row as i32 * 54;
-            self.control("STATIC", name, 0, 24, y, 90, 24, 0);
+            let y = 269 + row as i32 * 54;
+            self.control("STATIC", name, 0, 34, y, 90, 24, 0);
             for axis in 0..3 {
                 let id = 220 + row as i32 * 3 + axis;
                 let x = 112 + axis * 205;
@@ -284,49 +284,37 @@ impl App {
         }
         self.control(
             "STATIC",
-            "坐姿支持敲字、长按和挥手；互动结束回到所设姿态。",
+            "坐姿支持敲字、长按和挥手。互动结束后回到所设姿态。",
             0,
-            24,
-            554,
+            34,
+            609,
             710,
             24,
             0,
         );
         self.control(
             "STATIC",
-            "头部角度在关闭视线跟随后生效；不弯曲肢体。",
+            "关闭视线跟随后，设置的头部角度会生效。",
             0,
-            24,
-            580,
+            34,
+            635,
             710,
             24,
             0,
         );
 
         self.building_page = 3;
-        self.control("BUTTON", "检查更新", BS_PUSHBUTTON as u32 | WS_TABSTOP, 24, 690, 120, 30, 170);
-        self.control("BUTTON", "GitHub", BS_PUSHBUTTON as u32 | WS_TABSTOP, 614, 690, 120, 30, 169);
-        self.status = self.control("STATIC", "已保存", 0, 24, 738, 465, 24, 320);
-        self.control(
-            "STATIC",
-            "由GPT 6 Astra制作",
-            SS_RIGHT,
-            490,
-            738,
-            244,
-            24,
-            0,
-        );
-        self.control(
-            "STATIC",
-            "拖动摆放 · 右键菜单 · 双击设置；关闭此窗口不会退出桌宠。",
-            0,
-            24,
-            764,
-            710,
-            22,
-            0,
-        );
+        self.control("STATIC", "键盘与鼠标使用情况", 0, 34, 137, 590, 28, 0);
+        self.control("STATIC", "查看键盘和鼠标热力图、滚轮方向次数、最近 7 天趋势与常用输入。", 0, 34, 173, 695, 24, 0);
+        self.control("BUTTON", "打开按键统计…", BS_PUSHBUTTON as u32 | WS_TABSTOP, 34, 211, 184, 36, 190);
+        self.control("STATIC", "本机记录", 0, 34, 288, 400, 24, 0);
+        self.control("STATIC", "次数保存在本机，最近输入仅在本次运行期间显示。", 0, 34, 323, 695, 24, 0);
+        self.control("STATIC", "也可以从桌宠的右键菜单直接打开统计窗口。", 0, 34, 352, 695, 24, 0);
+        self.building_page = 4;
+        self.control("BUTTON", "检查更新", BS_PUSHBUTTON as u32 | WS_TABSTOP, 24, 782, 105, 32, 170);
+        self.control("BUTTON", "GitHub", BS_PUSHBUTTON as u32 | WS_TABSTOP, 622, 782, 112, 32, 169);
+        self.status = self.control("STATIC", "已保存", 0, 150, 781, 452, 25, 320);
+        self.control("STATIC", "关闭控制台后，桌宠仍会留在桌面。", 0, 150, 807, 452, 21, 0);
         self.apply_theme();
         self.show_page(self.panel_page);
         self.refresh_panel();
@@ -335,18 +323,18 @@ impl App {
         SetForegroundWindow(self.panel);
     }
     pub(super) unsafe fn show_page(&mut self, page: u8) {
-        self.panel_page = page.min(2);
+        self.panel_page = page.min(3);
         for &(hwnd, owner) in &self.page_controls {
             ShowWindow(
                 hwnd,
-                if owner == 3 || owner == self.panel_page {
+                if owner == 4 || owner == self.panel_page {
                     SW_SHOW
                 } else {
                     SW_HIDE
                 },
             );
         }
-        for i in 0..3 {
+        for i in 0..4 {
             SendMessageW(
                 self.ctrl(150 + i),
                 BM_SETCHECK,
@@ -359,7 +347,7 @@ impl App {
             );
         }
         if !self.panel.is_null() {
-            InvalidateRect(self.panel, null(), 1);
+            RedrawWindow(self.panel, null(), null_mut(), RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
         }
     }
     unsafe fn panel_fit(&self, monitor: HMONITOR, dpi: f32) -> f32 {
@@ -367,7 +355,7 @@ impl App {
         info.cbSize = std::mem::size_of::<MONITORINFO>() as u32;
         GetMonitorInfoW(monitor, &mut info);
         dpi.min((info.rcWork.right - info.rcWork.left - 32) as f32 / 780.)
-            .min((info.rcWork.bottom - info.rcWork.top - 64) as f32 / 796.)
+            .min((info.rcWork.bottom - info.rcWork.top - 64) as f32 / (PANEL_HEIGHT + 10.))
     }
     unsafe fn panel_dpi(&mut self, hwnd: HWND, w: WPARAM, l: LPARAM) {
         let p = *(l as *const RECT);
@@ -379,7 +367,7 @@ impl App {
             left: 0,
             top: 0,
             right: (760. * d) as i32,
-            bottom: (786. * d) as i32,
+            bottom: (PANEL_HEIGHT * d) as i32,
         };
         AdjustWindowRectExForDpi(
             &mut rect,
@@ -398,7 +386,7 @@ impl App {
             SWP_NOZORDER | SWP_NOACTIVATE,
         );
         let font = CreateFontW(
-            (-16. * d) as i32,
+            (-15. * d) as i32,
             0,
             0,
             0,
@@ -537,7 +525,12 @@ impl App {
             })
             .as_ptr(),
         );
-        SetWindowTextW(self.ctrl(333), wide(&self.online_notice).as_ptr());
+        let skin_hint = if self.online_notice.is_empty() {
+            "输入 Java 版用户名或 UUID 后获取皮肤"
+        } else {
+            &self.online_notice
+        };
+        SetWindowTextW(self.ctrl(333), wide(skin_hint).as_ptr());
         for (id, checked) in [
             (110, self.settings.posture == "standing"),
             (111, self.settings.posture == "sitting"),

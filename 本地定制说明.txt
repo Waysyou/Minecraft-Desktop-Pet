@@ -1,0 +1,6 @@
+本地定制版：基于 Minecraft Desktop Pet v2.5，新增 74 键立体键盘。
+角色、坐姿、皮肤、披风和按键行为仍沿用原项目；键帽随真实按键状态下压与变色。
+原官方版本与用户数据备份：G:\Desktop-Apps\backups\Minecraft-Desktop-Pet\before-quota-keyboard-20261024
+定制源码：G:\Desktop-Apps\development\Minecraft-Desktop-Pet-v2.5-keyboard
+额度与状态气泡说明：G:\Desktop-Apps\codex-integration\原生本体接入说明.md
+后续若直接安装官方新版，本地定制的键盘渲染会被官方 EXE 替换；气泡接入为独立程序。

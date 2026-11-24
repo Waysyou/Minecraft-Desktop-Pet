@@ -1,3 +1,5 @@
+#[path = "render_keyboard.rs"]
+mod keyboard_model;
 #[path = "render_effects.rs"]
 mod effects;
 use crate::config::Settings;
@@ -296,7 +298,7 @@ impl Skin {
         })
     }
 }
-pub fn key_position(vk: u32) -> Option<Vec2> {
+fn keyboard_rows() -> Vec<Vec<(u32, f32)>> {
     let rows: Vec<Vec<(u32, f32)>> = vec![
         std::iter::once((27, 1.5))
             .chain((112..124).map(|v| (v, 1.08)))
@@ -328,13 +330,18 @@ pub fn key_position(vk: u32) -> Option<Vec2> {
             (163, 1.25),
         ],
     ];
-    for (r, row) in rows.iter().enumerate() {
+    rows
+}
+pub fn key_position(vk: u32) -> Option<Vec2> {
+    for (r, row) in keyboard_rows().iter().enumerate() {
         let total: f32 = row.iter().map(|p| p.1).sum();
         let mut x = -9.1;
         for &(code, width) in row {
             let w = 18.2 * width / total;
             if code == vk {
-                return Some(Vec2::new(x + w / 2., -3.1 + r as f32 * 1.23));
+                // Layout is read from the seated character's side: actor-left is
+                // +X, and the function row is farther forward (+Z) than Space.
+                return Some(-Vec2::new(x + w / 2., -3.1 + r as f32 * 1.23));
             }
             x += w;
         }
@@ -1023,6 +1030,7 @@ struct BoxPart {
     inflate: f32,
     mirror: bool,
     keyboard: bool,
+    color: Option<[u8; 3]>,
     cape: bool,
     /// Q 版模式：六个面各自独立的 UV，顺序同 `draw_box` 的 face 0..5
     /// （+x 左 / -x 右 / +y 顶 / -y 底 / +z 前 / -z 后）。`None` 表示用标准
@@ -1074,7 +1082,7 @@ fn parts_with_cape(
             transform,
             inflate: 0.,
             mirror,
-            keyboard: false,
+            keyboard: false, color: None,
             cape: false,
             faces: None,
             eyes: if eyes && s.da_blink && !s.chibi { skin.eyes } else { None },
@@ -1088,7 +1096,7 @@ fn parts_with_cape(
                 transform,
                 inflate: if hat { 1. } else { 0.5 },
                 mirror,
-                keyboard: false,
+                keyboard: false, color: None,
                 cape: false,
                 faces: None,
                 // 外层帽子是叠加在头部上的一层，眼皮由内层负责。
@@ -1201,7 +1209,7 @@ fn parts_with_cape(
                 * Mat4::from_rotation_x(0.14),
             inflate: 0.,
             mirror: false,
-            keyboard: false,
+            keyboard: false, color: None,
             cape: true,
             faces: None,
             eyes: None,
@@ -1219,21 +1227,7 @@ fn parts_with_cape(
         part.transform = squash * part.transform;
     }
     if pose.sit > 0.4 {
-        v.push(BoxPart {
-            size: Vec3::new(19.6, 0.65, 7.8),
-            uv: Vec2::ZERO,
-            transform: Mat4::from_translation(Vec3::new(0., 10.2, 9.4))
-                * Mat4::from_scale(Vec3::splat(pose.sit))
-                * Mat4::from_translation(Vec3::new(0., -0.3, 0.)),
-            inflate: 0.,
-            mirror: false,
-            keyboard: true,
-            cape: false,
-            faces: None,
-            eyes: None,
-            eyelid: 1.,
-            pupil: Vec2::ZERO,
-        });
+        v.extend(keyboard_model::parts(pose,10.2));
     }
     let global = model_transform(s);
     for part in &mut v {
@@ -1295,7 +1289,7 @@ fn parts_chibi(s: &Settings, skin: &Skin, pose: &Pose) -> Vec<BoxPart> {
             transform: t,
             inflate: if layer { 0.5 } else { 0. },
             mirror: false,
-            keyboard: false,
+            keyboard: false, color: None,
             cape: false,
             faces: Some(cb.faces),
             eyes: if eyes && s.da_blink && !s.chibi { skin.eyes } else { None },
@@ -1406,21 +1400,7 @@ fn parts_chibi(s: &Settings, skin: &Skin, pose: &Pose) -> Vec<BoxPart> {
     }
     // 坐姿打字键盘：和标准人形同一套尺寸/渐入，放在 Q 版坐姿身体前方。
     if pose.sit > 0.4 {
-        v.push(BoxPart {
-            size: Vec3::new(19.6, 0.65, 7.8),
-            uv: Vec2::ZERO,
-            transform: Mat4::from_translation(Vec3::new(0., 5., 9.4))
-                * Mat4::from_scale(Vec3::splat(pose.sit))
-                * Mat4::from_translation(Vec3::new(0., -0.3, 0.)),
-            inflate: 0.,
-            mirror: false,
-            keyboard: true,
-            cape: false,
-            faces: None,
-            eyes: None,
-            eyelid: 1.,
-            pupil: Vec2::ZERO,
-        });
+        v.extend(keyboard_model::parts(pose,5.));
     }
     let global = model_transform(s);
     for part in &mut v {
@@ -1704,10 +1684,11 @@ impl Frame {
             .min(self.height as f32) as usize;
         let texscale = skin.image.width() as f32 / 64.;
         let shades = [0.80f32, 0.80, 1., 0.62, 0.94, 0.86];
-        let gray = [131u8, 135, 138].map(|c| {
+        let gray = b.color.unwrap_or([131u8, 135, 138]).map(|c| {
             let l = (((c as f32 / 255. + 0.055) / 1.055).powf(2.4) * shades[face]).max(0.);
             ((1.055 * l.powf(1. / 2.4) - 0.055) * 255. + 0.5) as u8
         });
+        let legend=if b.keyboard && face==2 {keyboard_model::legend(b.uv.x as u32)} else {""};
         let inv_area = area.recip();
         let ax = -(p[2].y - p[1].y) * inv_area;
         let ay = (p[2].x - p[1].x) * inv_area;
@@ -1760,7 +1741,7 @@ impl Frame {
                     continue;
                 }
                 let (color, alpha) = if b.keyboard {
-                    (gray, 255)
+                    ({ let tx=(tex[1].x+ta.x*a+tc.x*c)/texscale; let ty=(tex[1].y+ta.y*a+tc.y*c)/texscale; let ink=keyboard_model::legend_alpha(legend,(tx-b.uv.x-b.size.z)/b.size.x,(ty-b.uv.y)/b.size.z); gray.map(|channel|(channel as f32*(1.-ink)+40.*ink) as u8) }, 255)
                 } else {
                     let tx = tex[1].x + ta.x * a + tc.x * c;
                     let ty = tex[1].y + ta.y * a + tc.y * c;
@@ -2053,7 +2034,7 @@ mod tests {
     #[test]
     fn custom_typing_target_changes_do_not_teleport_the_arm() {
         let skin = Skin::load(DEFAULT_SKIN).unwrap();
-        for (side, first, next) in [(1, 81, 84), (0, 80, 89)] {
+        for (side, first, next) in [(0, 81, 84), (1, 80, 89)] {
             let mut s = Settings::default();
             s.posture = "custom".into();
             s.custom_base = "sitting".into();
@@ -2204,7 +2185,7 @@ mod tests {
         assert_eq!(p.sit, 1.);
         assert!(parts(&s, &skin, &p).iter().any(|b| b.keyboard));
         let idle = p.arms;
-        for (side, vk, left) in [(1, 81, false), (0, 80, true)] {
+        for (side, vk, left) in [(0, 81, true), (1, 80, false)] {
             p.key(vk, true, 2., &s);
             tick(&mut p, &s, &skin, 2.08, false);
             assert!((p.squash - 0.95).abs() < 0.001);
@@ -2267,7 +2248,7 @@ mod tests {
         let (mut s, skin, mut p) = seated();
         s.main_hand = "left".into();
         let rest = p.arms[0];
-        p.key(80, true, 1., &s);
+        p.key(81, true, 1., &s);
         for i in 0..120 {
             tick(&mut p, &s, &skin, 1. + i as f32 / 120., false);
         }
@@ -2280,7 +2261,7 @@ mod tests {
         tick(&mut p, &s, &skin, 2.5, false);
         assert!(p.arms[0].angle_between(held) < 0.001);
         p.click(3., true);
-        p.key(80, false, 3.05, &s);
+        p.key(81, false, 3.05, &s);
         for i in 0..120 {
             tick(&mut p, &s, &skin, 3. + i as f32 / 120., false);
         }
@@ -2330,7 +2311,7 @@ mod tests {
             transform: Mat4::IDENTITY,
             inflate: 1.,
             mirror: false,
-            keyboard: false,
+            keyboard: false, color: None,
             cape: false,
             faces: None,
             eyes: None,
@@ -2422,7 +2403,7 @@ mod tests {
                             transform,
                             inflate: 0.,
                             mirror,
-                            keyboard: false,
+                            keyboard: false, color: None,
                             cape: false,
                             faces: None,
                             eyes: None,
@@ -2979,7 +2960,7 @@ mod tests {
     #[test]
     fn held_key_keeps_hand_but_squash_recovers() {
         let (s, skin, mut p) = seated();
-        let rest = p.arms[1];
+        let rest = p.arms[0];
         p.key(81, true, 1., &s);
         tick(&mut p, &s, &skin, 1.08, false);
         assert!((p.squash - 0.95).abs() < 1e-6);
@@ -2992,7 +2973,7 @@ mod tests {
         }
         assert_eq!(p.held_codes(), vec![81]);
         assert_eq!(p.squash, 1.);
-        assert!(p.arms[1].angle_between(rest) > 0.05);
+        assert!(p.arms[0].angle_between(rest) > 0.05);
         assert_eq!(
             parts(&s, &skin, &p)
                 .iter()
@@ -3001,16 +2982,16 @@ mod tests {
                 .transform,
             board
         );
-        let held_pose = p.arms[1];
+        let held_pose = p.arms[0];
         for i in 240..360 {
             tick(&mut p, &s, &skin, 1. + i as f32 / 120., false);
         }
-        assert!(p.arms[1].angle_between(held_pose) < 0.001);
+        assert!(p.arms[0].angle_between(held_pose) < 0.001);
         p.key(81, false, 4., &s);
         for i in 0..120 {
             tick(&mut p, &s, &skin, 4. + i as f32 / 120., false);
         }
-        assert!(p.arms[1].angle_between(rest) < 0.001);
+        assert!(p.arms[0].angle_between(rest) < 0.001);
         assert!(p.held.is_empty());
     }
     #[test]
@@ -3108,17 +3089,17 @@ mod tests {
         for i in 0..60 {
             tick(&mut p, &s, &skin, 1. + i as f32 / 120., false);
         }
-        let q = p.arms[1];
+        let q = p.arms[0];
         p.key(84, true, 1.5, &s);
         for i in 0..60 {
             tick(&mut p, &s, &skin, 1.5 + i as f32 / 120., false);
         }
-        assert!(p.arms[1].angle_between(q) > 0.03);
+        assert!(p.arms[0].angle_between(q) > 0.03);
         p.key(84, false, 2., &s);
         for i in 0..60 {
             tick(&mut p, &s, &skin, 2. + i as f32 / 120., false);
         }
-        assert!(p.arms[1].angle_between(q) < 0.001);
+        assert!(p.arms[0].angle_between(q) < 0.001);
         p.reset_keys();
         s.typing_mode = "alternating".into();
         p.key(81, true, 3., &s);
@@ -3135,7 +3116,7 @@ mod tests {
     #[test]
     fn swing_overrides_then_returns_to_live_keyboard_pose() {
         let (s, skin, mut p) = seated();
-        p.key(81, true, 1., &s);
+        p.key(80, true, 1., &s);
         for i in 0..120 {
             tick(&mut p, &s, &skin, 1. + i as f32 / 120., false);
         }
@@ -3155,9 +3136,9 @@ mod tests {
         assert!(excursion > 0.3);
         assert!(max_delta < 0.6);
         assert!(p.arms[1].angle_between(pressed) < 0.001);
-        assert_eq!(p.held_codes(), vec![81]);
+        assert_eq!(p.held_codes(), vec![80]);
         p.click(3., false);
-        p.key(81, false, 3.05, &s);
+        p.key(80, false, 3.05, &s);
         for i in 0..120 {
             tick(&mut p, &s, &skin, 3. + i as f32 / 120., false);
         }
@@ -3190,7 +3171,7 @@ mod tests {
         assert!(key_position(112).is_some());
         assert!(key_position(96).is_none());
         assert!(key_position(37).is_none());
-        assert!(key_position(81).unwrap().x < 0.);
+        assert!(key_position(81).unwrap().x > 0.);
     }
     #[test]
     fn head_is_immediate() {

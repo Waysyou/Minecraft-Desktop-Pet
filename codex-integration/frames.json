@@ -1,0 +1,446 @@
+[
+  {
+    "row": 0,
+    "col": 0,
+    "state": "idle",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\00-00.png"
+  },
+  {
+    "row": 0,
+    "col": 1,
+    "state": "idle",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\00-01.png"
+  },
+  {
+    "row": 0,
+    "col": 2,
+    "state": "idle",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\00-02.png"
+  },
+  {
+    "row": 0,
+    "col": 3,
+    "state": "idle",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\00-03.png"
+  },
+  {
+    "row": 0,
+    "col": 4,
+    "state": "idle",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\00-04.png"
+  },
+  {
+    "row": 0,
+    "col": 5,
+    "state": "idle",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\00-05.png"
+  },
+  {
+    "row": 1,
+    "col": 0,
+    "state": "running-right",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\01-00.png"
+  },
+  {
+    "row": 1,
+    "col": 1,
+    "state": "running-right",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\01-01.png"
+  },
+  {
+    "row": 1,
+    "col": 2,
+    "state": "running-right",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\01-02.png"
+  },
+  {
+    "row": 1,
+    "col": 3,
+    "state": "running-right",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\01-03.png"
+  },
+  {
+    "row": 1,
+    "col": 4,
+    "state": "running-right",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\01-04.png"
+  },
+  {
+    "row": 1,
+    "col": 5,
+    "state": "running-right",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\01-05.png"
+  },
+  {
+    "row": 1,
+    "col": 6,
+    "state": "running-right",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\01-06.png"
+  },
+  {
+    "row": 1,
+    "col": 7,
+    "state": "running-right",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\01-07.png"
+  },
+  {
+    "row": 2,
+    "col": 0,
+    "state": "running-left",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\02-00.png"
+  },
+  {
+    "row": 2,
+    "col": 1,
+    "state": "running-left",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\02-01.png"
+  },
+  {
+    "row": 2,
+    "col": 2,
+    "state": "running-left",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\02-02.png"
+  },
+  {
+    "row": 2,
+    "col": 3,
+    "state": "running-left",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\02-03.png"
+  },
+  {
+    "row": 2,
+    "col": 4,
+    "state": "running-left",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\02-04.png"
+  },
+  {
+    "row": 2,
+    "col": 5,
+    "state": "running-left",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\02-05.png"
+  },
+  {
+    "row": 2,
+    "col": 6,
+    "state": "running-left",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\02-06.png"
+  },
+  {
+    "row": 2,
+    "col": 7,
+    "state": "running-left",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\02-07.png"
+  },
+  {
+    "row": 3,
+    "col": 0,
+    "state": "waving",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\03-00.png"
+  },
+  {
+    "row": 3,
+    "col": 1,
+    "state": "waving",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\03-01.png"
+  },
+  {
+    "row": 3,
+    "col": 2,
+    "state": "waving",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\03-02.png"
+  },
+  {
+    "row": 3,
+    "col": 3,
+    "state": "waving",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\03-03.png"
+  },
+  {
+    "row": 4,
+    "col": 0,
+    "state": "jumping",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\04-00.png"
+  },
+  {
+    "row": 4,
+    "col": 1,
+    "state": "jumping",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\04-01.png"
+  },
+  {
+    "row": 4,
+    "col": 2,
+    "state": "jumping",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\04-02.png"
+  },
+  {
+    "row": 4,
+    "col": 3,
+    "state": "jumping",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\04-03.png"
+  },
+  {
+    "row": 4,
+    "col": 4,
+    "state": "jumping",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\04-04.png"
+  },
+  {
+    "row": 5,
+    "col": 0,
+    "state": "failed",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\05-00.png"
+  },
+  {
+    "row": 5,
+    "col": 1,
+    "state": "failed",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\05-01.png"
+  },
+  {
+    "row": 5,
+    "col": 2,
+    "state": "failed",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\05-02.png"
+  },
+  {
+    "row": 5,
+    "col": 3,
+    "state": "failed",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\05-03.png"
+  },
+  {
+    "row": 5,
+    "col": 4,
+    "state": "failed",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\05-04.png"
+  },
+  {
+    "row": 5,
+    "col": 5,
+    "state": "failed",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\05-05.png"
+  },
+  {
+    "row": 5,
+    "col": 6,
+    "state": "failed",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\05-06.png"
+  },
+  {
+    "row": 5,
+    "col": 7,
+    "state": "failed",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\05-07.png"
+  },
+  {
+    "row": 6,
+    "col": 0,
+    "state": "waiting",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\06-00.png"
+  },
+  {
+    "row": 6,
+    "col": 1,
+    "state": "waiting",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\06-01.png"
+  },
+  {
+    "row": 6,
+    "col": 2,
+    "state": "waiting",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\06-02.png"
+  },
+  {
+    "row": 6,
+    "col": 3,
+    "state": "waiting",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\06-03.png"
+  },
+  {
+    "row": 6,
+    "col": 4,
+    "state": "waiting",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\06-04.png"
+  },
+  {
+    "row": 6,
+    "col": 5,
+    "state": "waiting",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\06-05.png"
+  },
+  {
+    "row": 7,
+    "col": 0,
+    "state": "running",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\07-00.png"
+  },
+  {
+    "row": 7,
+    "col": 1,
+    "state": "running",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\07-01.png"
+  },
+  {
+    "row": 7,
+    "col": 2,
+    "state": "running",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\07-02.png"
+  },
+  {
+    "row": 7,
+    "col": 3,
+    "state": "running",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\07-03.png"
+  },
+  {
+    "row": 7,
+    "col": 4,
+    "state": "running",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\07-04.png"
+  },
+  {
+    "row": 7,
+    "col": 5,
+    "state": "running",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\07-05.png"
+  },
+  {
+    "row": 8,
+    "col": 0,
+    "state": "review",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\08-00.png"
+  },
+  {
+    "row": 8,
+    "col": 1,
+    "state": "review",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\08-01.png"
+  },
+  {
+    "row": 8,
+    "col": 2,
+    "state": "review",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\08-02.png"
+  },
+  {
+    "row": 8,
+    "col": 3,
+    "state": "review",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\08-03.png"
+  },
+  {
+    "row": 8,
+    "col": 4,
+    "state": "review",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\08-04.png"
+  },
+  {
+    "row": 8,
+    "col": 5,
+    "state": "review",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\08-05.png"
+  },
+  {
+    "row": 0,
+    "col": 6,
+    "state": "neutral",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\00-06.png"
+  },
+  {
+    "row": 9,
+    "col": 0,
+    "state": "look-000.0",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\09-00.png"
+  },
+  {
+    "row": 9,
+    "col": 1,
+    "state": "look-022.5",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\09-01.png"
+  },
+  {
+    "row": 9,
+    "col": 2,
+    "state": "look-045.0",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\09-02.png"
+  },
+  {
+    "row": 9,
+    "col": 3,
+    "state": "look-067.5",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\09-03.png"
+  },
+  {
+    "row": 9,
+    "col": 4,
+    "state": "look-090.0",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\09-04.png"
+  },
+  {
+    "row": 9,
+    "col": 5,
+    "state": "look-112.5",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\09-05.png"
+  },
+  {
+    "row": 9,
+    "col": 6,
+    "state": "look-135.0",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\09-06.png"
+  },
+  {
+    "row": 9,
+    "col": 7,
+    "state": "look-157.5",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\09-07.png"
+  },
+  {
+    "row": 10,
+    "col": 0,
+    "state": "look-180.0",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\10-00.png"
+  },
+  {
+    "row": 10,
+    "col": 1,
+    "state": "look-202.5",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\10-01.png"
+  },
+  {
+    "row": 10,
+    "col": 2,
+    "state": "look-225.0",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\10-02.png"
+  },
+  {
+    "row": 10,
+    "col": 3,
+    "state": "look-247.5",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\10-03.png"
+  },
+  {
+    "row": 10,
+    "col": 4,
+    "state": "look-270.0",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\10-04.png"
+  },
+  {
+    "row": 10,
+    "col": 5,
+    "state": "look-292.5",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\10-05.png"
+  },
+  {
+    "row": 10,
+    "col": 6,
+    "state": "look-315.0",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\10-06.png"
+  },
+  {
+    "row": 10,
+    "col": 7,
+    "state": "look-337.5",
+    "path": "G:\\Desktop-Apps\\codex-integration\\frames\\10-07.png"
+  }
+]

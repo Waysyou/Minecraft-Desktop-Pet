@@ -1,3 +1,9 @@
+> **个人定制分支 (custom-v2.5-codex)**：基于上游 DLmember/Minecraft-Desktop-Pet v2.5 定制，新增：
+> 1. **74 键立体键盘渲染**（
+ative/src/render_keyboard.rs）：键帽随真实按键状态下压与变色；
+> 2. **Codex / Qoder 双 AI 思考气泡与按键统计联动**（
+ative/src/codex_bridge.rs + codex-integration/）：显示 AI 任务状态、额度与用量，并在右键菜单/控制台提供按键统计入口。
+> 详细说明见 [本地定制说明.txt](本地定制说明.txt) 与 [codex-integration/使用说明.md](codex-integration/使用说明.md)。
 # Minecraft桌宠
 
 让一个 Minecraft 风格的小人待在桌面上，跟着鼠标转头，陪你敲键盘。

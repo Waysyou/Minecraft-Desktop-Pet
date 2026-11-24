@@ -1,5 +1,6 @@
 #![windows_subsystem = "windows"]
 mod autostart;
+mod codex_bridge;
 mod config;
 mod hyp_chat;
 mod keyboard;
@@ -28,13 +29,17 @@ const TRAY_MSG: u32 = WM_APP + 1;
 const KEY_MSG: u32 = WM_APP + 2;
 const SHOW_MSG: u32 = WM_APP + 10;
 const SNAPSHOT_MSG: u32 = WM_APP + 11;
+// Read-only appearance query for the separate status bubble; upper bits identify this protocol.
+const APPEARANCE_MSG: u32 = WM_APP + 14;
+// Bubble delegates dragging to the pet so the persisted native position stays authoritative.
+const DRAG_MSG: u32 = WM_APP + 15;
 static mut APP: *mut App = null_mut();
 static mut PET_HWND: HWND = null_mut();
 // Diagnostic runs can isolate their injected test events from the user's typing.
 static mut TEST_INPUT_ONLY: bool = false;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub fn product_title() -> String {
-    format!("Minecraft桌宠 · v{}", VERSION.strip_suffix(".0").unwrap_or(VERSION))
+    format!("Minecraft桌宠 · v{} · 定制键盘", VERSION.strip_suffix(".0").unwrap_or(VERSION))
 }
 pub fn wide(s: &str) -> Vec<u16> {
     s.encode_utf16().chain(Some(0)).collect()
@@ -410,6 +415,22 @@ impl App {
         });
         self.save();
     }
+    unsafe fn begin_drag(&mut self) {
+        let mut p=POINT{x:0,y:0};GetCursorPos(&mut p);
+        self.drag=Some(POINT{x:p.x-self.pos.x,y:p.y-self.pos.y});self.wake();
+    }
+    unsafe fn update_drag(&mut self) {
+        if let Some(offset)=self.drag {
+            let mut p=POINT{x:0,y:0};GetCursorPos(&mut p);
+            self.pos=POINT{x:p.x-offset.x,y:p.y-offset.y};self.move_to();self.wake();
+        }
+    }
+    unsafe fn finish_drag(&mut self) {
+        if self.drag.is_none(){return;}
+        self.update_drag();self.drag=None;
+        if GetCapture()==self.hwnd {ReleaseCapture();}
+        self.constrain();self.move_to();self.save_position();self.wake();
+    }
     unsafe fn draw(&mut self, now: f32, dt: f32) {
         let logical = Vec2::new(
             (self.cursor.x - self.pos.x) as f32 / self.dpi,
@@ -459,7 +480,8 @@ impl App {
         self.frame.pixels[(sy*self.frame.width+sx)*4+3]>32
     }
     fn hover_opacity(&self) -> u8 {
-        if !self.settings.click_through || self.width <= 0 || self.height <= 0 {
+        if self.drag.is_some(){return 255;}
+        if self.width <= 0 || self.height <= 0 {
             return 255;
         }
         let x = self.cursor.x as i64 - self.pos.x as i64;
@@ -749,6 +771,11 @@ impl App {
     }
     unsafe fn command(&mut self, id: u32) {
         match id {
+            180 => codex_bridge::toggle(),
+            181 => codex_bridge::start(),
+            182 => codex_bridge::stop(),
+            183 => codex_bridge::appearance(),
+            190 => codex_bridge::key_stats(),
             100 => self.show_panel(),
             101 => self.choose_skin(),
             104 => self.fetch_skin(),
@@ -917,7 +944,7 @@ impl App {
             171 => { self.settings.music_notes = !self.settings.music_notes; self.changed(); }
             172 => { self.settings.tease_enabled = !self.settings.tease_enabled; self.changed(); }
             173 => { self.settings.breathing_animation = !self.settings.breathing_animation;  self.changed(); }
-            150..=152 => self.show_page((id - 150) as u8),
+            150..=153 => self.show_page((id - 150) as u8),
             140..=143 => {
                 self.settings.scale = [0.75, 1., 1.25, 1.5][(id - 140) as usize];
                 self.resize_pet();
@@ -953,6 +980,9 @@ impl App {
         self.menu_open = true;
         self.drag = None;
         let menu = CreatePopupMenu();
+        AppendMenuW(menu, MF_STRING, 190, wide("按键统计…").as_ptr());
+        AppendMenuW(menu, MF_SEPARATOR, 0, null());
+        codex_bridge::append_to(menu);
         let items = [
             (100, "打开控制台", false),
             (101, "导入皮肤…", false),
@@ -1092,6 +1122,11 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
         return 0;
     }
     match msg {
+        APPEARANCE_MSG => (0x50455400u32 | a.opacity as u32) as isize,
+        DRAG_MSG => {
+            match w {0=>a.begin_drag(),1=>a.update_drag(),2=>a.finish_drag(),_=>return 0}
+            0x50455401u32 as isize
+        }
         hyp_chat::MESSAGE => {
             if let Err(message) = hyp_chat::insert(w as HWND) {
                 a.notice = message.into();
@@ -1130,31 +1165,17 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
         }
         WM_LBUTTONDOWN => {
             a.native_mouse_press(0);
-            let mut p = POINT { x: 0, y: 0 };
-            GetCursorPos(&mut p);
-            a.drag = Some(POINT {
-                x: p.x - a.pos.x,
-                y: p.y - a.pos.y,
-            });
+            a.begin_drag();
             SetCapture(hwnd);
             0
         }
+        WM_MOUSEMOVE => {a.update_drag();0}
         WM_LBUTTONUP => {
-            if a.drag.take().is_some() {
-                ReleaseCapture();
-                a.constrain();
-                a.move_to();
-                a.save_position();
-                a.wake();
-            }
+            a.finish_drag();
             0
         }
         WM_CAPTURECHANGED => {
-            if a.drag.take().is_some() {
-                a.constrain();
-                a.move_to();
-                a.save_position();
-            }
+            a.finish_drag();
             0
         }
         WM_LBUTTONDBLCLK => {
@@ -1231,6 +1252,7 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
             0
         }
         WM_DESTROY => {
+            if !a.diagnostic { codex_bridge::stop(); }
             a.tray(NIM_DELETE);
             UnregisterHotKey(hwnd, 1);
             if !a.hook.is_null() {
@@ -1349,7 +1371,7 @@ fn main() {
         return;
     }
     // 程序被移动或改名后，自启项会在下次启动时自动改写成当前路径。
-    autostart::sync(app.settings.autostart, &dir);
+    if !diag { autostart::sync(app.settings.autostart, &dir); }
     unsafe {
         SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
         TEST_INPUT_ONLY = diag && args.iter().any(|a| a == "--test-input-only");
@@ -1389,7 +1411,7 @@ fn main() {
         APP = &mut *app;
         app.geometry();
         let hwnd = CreateWindowExW(
-            WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
+            WS_EX_LAYERED | WS_EX_NOACTIVATE | if diag {0}else{WS_EX_TOOLWINDOW},
             class.as_ptr(),
             wide(&product_title()).as_ptr(),
             WS_POPUP,
@@ -1432,6 +1454,7 @@ fn main() {
         // Low-priority fallback for Windows-owned modal loops (menus/file picker).
         SetTimer(hwnd, 1, 16, None);
         app.save();
+        if !diag { codex_bridge::start(); }
         if !app.store.notice.is_empty() {
             app.notice = app.store.notice.clone();
         }
